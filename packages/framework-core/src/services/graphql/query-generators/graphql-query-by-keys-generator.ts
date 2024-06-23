@@ -13,7 +13,9 @@ export class GraphqlQueryByKeysGenerator {
 
   public generateByKeysQueries(): GraphQLFieldConfigMap<unknown, GraphQLResolverContext> {
     const queries: GraphQLFieldConfigMap<unknown, GraphQLResolverContext> = {}
-    for (const readModel of this.readModels) {
+    const readModelsThatRequireGraphQLQueries = this.filterReadModelsThatRequireGraphQLQueries(this.readModels, this.config);
+
+    for (const readModel of readModelsThatRequireGraphQLQueries) {
       const readModelName = readModel.name
       const sequenceKeyName = this.config.readModelSequenceKeys[readModelName]
       if (sequenceKeyName) {
@@ -23,6 +25,13 @@ export class GraphqlQueryByKeysGenerator {
       }
     }
     return queries
+  }
+
+  private filterReadModelsThatRequireGraphQLQueries(readModels: any[], config: any): any[] {
+    return readModels.filter((readModel) => {
+      const graphqlQueryGenerationConfig = config.readModels[readModel.name].graphqlQueryGenerationConfig;
+      return graphqlQueryGenerationConfig === 'GRAPHQL_LIST_AND_SINGLE_QUERIES' || graphqlQueryGenerationConfig === 'GRAPHQL_SINGLE_QUERY';
+    });
   }
 
   private generateByIdQuery(readModel: AnyClass): GraphQLFieldConfig<unknown, GraphQLResolverContext> {

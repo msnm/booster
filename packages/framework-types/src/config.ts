@@ -54,6 +54,8 @@ export class BoosterConfig {
 
   public enableGraphQLIntrospection = true
 
+  public enableAutomaticGraphQLQueryGenerationFromReadModels = true
+
   private _userProjectRootPath?: string
 
   public readonly codeRelativePath: string = 'dist'
