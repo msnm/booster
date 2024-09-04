@@ -2,8 +2,7 @@ import {
   Class,
   ReadModelAuthorizer,
   ReadModelFilterHooks,
-  ReadModelGraphqlQueryGeneratorConfig,
-  ReadModelGraphqlSubscriptionGeneratorConfig,
+  ReadModelGraphqlGenerationConfig,
   ReadModelInterface,
   ReadModelRoleAccess,
 } from '@boostercloud/framework-types'
@@ -16,7 +15,8 @@ import { getClassMetadata } from './metadata'
  * @param attributes
  */
 export function ReadModel(
-  attributes: ReadModelRoleAccess & ReadModelFilterHooks, graphQLQueryConfiguration: ReadModelGraphqlQueryGeneratorConfig, graphQLSubscriptionConfiguration: ReadModelGraphqlSubscriptionGeneratorConfig
+  attributes: ReadModelRoleAccess & ReadModelFilterHooks,
+  graphQLGenerationConfiguration: ReadModelGraphqlGenerationConfig
 ): (readModelClass: Class<ReadModelInterface>, context?: ClassDecoratorContext) => void {
   return (readModelClass) => {
     Booster.configureCurrentEnv((config): void => {
@@ -27,30 +27,28 @@ export function ReadModel(
 
       const enableAutomaticGraphQLQueryGenerationFromReadModels = config.enableAutomaticGraphQLQueryGenerationFromReadModels;
       if (enableAutomaticGraphQLQueryGenerationFromReadModels) {
-        if (!graphQLQueryConfiguration) {
-          graphQLQueryConfiguration = 'GRAPHQL_LIST_AND_SINGLE_QUERIES';
+        if (!graphQLGenerationConfiguration.queryGeneration) {
+          graphQLGenerationConfiguration.queryGeneration = 'GRAPHQL_LIST_AND_SINGLE'
         }
-        if (!graphQLSubscriptionConfiguration) {
-          graphQLSubscriptionConfiguration = 'GRAPHQL_LIST_AND_SINGLE_SUBSCRIPTION';
+        if (!graphQLGenerationConfiguration.subscriptionGeneration) {
+          graphQLGenerationConfiguration.subscriptionGeneration = 'GRAPHQL_LIST_AND_SINGLE'
+        }
+      } else {
+        if (!graphQLGenerationConfiguration.queryGeneration) {
+          graphQLGenerationConfiguration.queryGeneration = 'NO_GRAPHQL'
+        }
+        if (!graphQLGenerationConfiguration.subscriptionGeneration) {
+          graphQLGenerationConfiguration.subscriptionGeneration = 'NO_GRAPHQL'
         }
       }
-      if (!enableAutomaticGraphQLQueryGenerationFromReadModels) {
-        if (!graphQLQueryConfiguration) {
-          graphQLQueryConfiguration = 'NO_GRAPHQL_QUERIES';
-        }
-        if (!graphQLSubscriptionConfiguration) {
-          graphQLSubscriptionConfiguration = 'NO_GRAPHQL_SUBSCRIPTIONS';
-        }
-      }
-          
+
       const authorizer = BoosterAuthorizer.build(attributes) as ReadModelAuthorizer
       config.readModels[readModelClass.name] = {
         class: readModelClass,
         properties: getClassMetadata(readModelClass).fields,
         authorizer,
         before: attributes.before ?? [],
-        graphqlQueryGenerationConfig: graphQLQueryConfiguration,
-        graphqlSubscriptionGenerationConfig: graphQLSubscriptionConfiguration,
+        graphqlGenerationConfig: graphQLGenerationConfiguration,
       }
     })
   }
