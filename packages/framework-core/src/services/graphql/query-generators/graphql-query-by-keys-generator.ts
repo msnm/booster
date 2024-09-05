@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLID, GraphQLList, GraphQLNonNull } from 'graphql'
-import { GraphQLResolverContext, ResolverBuilder } from '../common'
+import { filterReadModelsThatRequireGraphQLQueries, GraphQLResolverContext, ResolverBuilder } from '../common'
 import { AnyClass, BoosterConfig } from '@boostercloud/framework-types'
 import { GraphQLTypeInformer } from '../graphql-type-informer'
 
@@ -13,10 +13,7 @@ export class GraphqlQueryByKeysGenerator {
 
   public generateByKeysQueries(): GraphQLFieldConfigMap<unknown, GraphQLResolverContext> {
     const queries: GraphQLFieldConfigMap<unknown, GraphQLResolverContext> = {}
-    const readModelsThatRequireGraphQLQueries = this.filterReadModelsThatRequireGraphQLQueries(
-      this.readModels,
-      this.config
-    )
+    const readModelsThatRequireGraphQLQueries = filterReadModelsThatRequireGraphQLQueries(this.readModels, this.config)
 
     for (const readModel of readModelsThatRequireGraphQLQueries) {
       const readModelName = readModel.name
@@ -28,15 +25,6 @@ export class GraphqlQueryByKeysGenerator {
       }
     }
     return queries
-  }
-
-  private filterReadModelsThatRequireGraphQLQueries(readModels: any[], config: any): any[] {
-    return readModels.filter((readModel) => {
-      const graphqlQueryGenerationConfig = config.readModels[readModel.name].graphqlGenerationConfig.queryGeneration
-      return (
-        graphqlQueryGenerationConfig === 'GRAPHQL_LIST_AND_SINGLE' || graphqlQueryGenerationConfig === 'GRAPHQL_LIST'
-      )
-    })
   }
 
   private generateByIdQuery(readModel: AnyClass): GraphQLFieldConfig<unknown, GraphQLResolverContext> {

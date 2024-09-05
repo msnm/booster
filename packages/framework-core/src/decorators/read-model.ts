@@ -2,7 +2,7 @@ import {
   Class,
   ReadModelAuthorizer,
   ReadModelFilterHooks,
-  ReadModelGraphqlGenerationConfig,
+  GenerationStrategy,
   ReadModelInterface,
   ReadModelRoleAccess,
 } from '@boostercloud/framework-types'
@@ -16,7 +16,8 @@ import { getClassMetadata } from './metadata'
  */
 export function ReadModel(
   attributes: ReadModelRoleAccess & ReadModelFilterHooks,
-  graphQLGenerationConfiguration: ReadModelGraphqlGenerationConfig
+  queryGeneration: GenerationStrategy[] = [],
+  subscriptionGeneration: GenerationStrategy[] = []
 ): (readModelClass: Class<ReadModelInterface>, context?: ClassDecoratorContext) => void {
   return (readModelClass) => {
     Booster.configureCurrentEnv((config): void => {
@@ -25,20 +26,21 @@ export function ReadModel(
         If you think that this is an error, try performing a clean build.`)
       }
 
-      const enableAutomaticGraphQLQueryGenerationFromReadModels = config.enableAutomaticGraphQLQueryGenerationFromReadModels;
+      const enableAutomaticGraphQLQueryGenerationFromReadModels =
+        config.enableAutomaticGraphQLQueryGenerationFromReadModels
       if (enableAutomaticGraphQLQueryGenerationFromReadModels) {
-        if (!graphQLGenerationConfiguration.queryGeneration) {
-          graphQLGenerationConfiguration.queryGeneration = 'GRAPHQL_LIST_AND_SINGLE'
+        if (!queryGeneration) {
+          queryGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
         }
-        if (!graphQLGenerationConfiguration.subscriptionGeneration) {
-          graphQLGenerationConfiguration.subscriptionGeneration = 'GRAPHQL_LIST_AND_SINGLE'
+        if (!subscriptionGeneration) {
+          subscriptionGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
         }
       } else {
-        if (!graphQLGenerationConfiguration.queryGeneration) {
-          graphQLGenerationConfiguration.queryGeneration = 'NO_GRAPHQL'
+        if (!queryGeneration) {
+          queryGeneration = [GenerationStrategy.NO_GRAPHQL]
         }
-        if (!graphQLGenerationConfiguration.subscriptionGeneration) {
-          graphQLGenerationConfiguration.subscriptionGeneration = 'NO_GRAPHQL'
+        if (!subscriptionGeneration) {
+          subscriptionGeneration = [GenerationStrategy.NO_GRAPHQL]
         }
       }
 
@@ -48,7 +50,8 @@ export function ReadModel(
         properties: getClassMetadata(readModelClass).fields,
         authorizer,
         before: attributes.before ?? [],
-        graphqlGenerationConfig: graphQLGenerationConfiguration,
+        queryGeneration,
+        subscriptionGeneration,
       }
     })
   }

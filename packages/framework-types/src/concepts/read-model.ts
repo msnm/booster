@@ -22,17 +22,17 @@ export interface ReadModelInterface {
   [key: string]: any
 }
 
-export type ReadModelGraphqlGenerationConfig = {
-  queryGeneration: GraphqlGenerationConfig
-  subscriptionGeneration: GraphqlGenerationConfig
+export enum GenerationStrategy {
+  GRAPHQL_LIST,
+  GRAPHQL_SINGLE,
+  NO_GRAPHQL,
 }
-
-export type GraphqlGenerationConfig = 'GRAPHQL_LIST_AND_SINGLE' | 'GRAPHQL_LIST' | 'GRAPHQL_SINGLE' | 'NO_GRAPHQL'
 
 export interface ReadModelMetadata<TReadModel extends ReadModelInterface = ReadModelInterface> {
   readonly class: Class<ReadModelInterface>
   readonly properties: Array<PropertyMetadata>
   readonly authorizer: ReadModelAuthorizer
   readonly before: NonNullable<ReadModelFilterHooks<TReadModel>['before']>
-  readonly graphqlGenerationConfig: ReadModelGraphqlGenerationConfig
+  readonly queryGeneration: GenerationStrategy[]
+  readonly subscriptionGeneration: GenerationStrategy[]
 }
