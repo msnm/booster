@@ -16,8 +16,10 @@ import { getClassMetadata } from './metadata'
  */
 export function ReadModel(
   attributes: ReadModelRoleAccess & ReadModelFilterHooks,
-  queryGeneration: GenerationStrategy[] = [],
-  subscriptionGeneration: GenerationStrategy[] = []
+  graphQlGeneration?: {
+    queryGeneration: GenerationStrategy[]
+    subscriptionGeneration: GenerationStrategy[]
+  }
 ): (readModelClass: Class<ReadModelInterface>, context?: ClassDecoratorContext) => void {
   return (readModelClass) => {
     Booster.configureCurrentEnv((config): void => {
@@ -28,19 +30,16 @@ export function ReadModel(
 
       const enableAutomaticGraphQLQueryGenerationFromReadModels =
         config.enableAutomaticGraphQLQueryGenerationFromReadModels
-      if (enableAutomaticGraphQLQueryGenerationFromReadModels) {
-        if (!queryGeneration) {
-          queryGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
-        }
-        if (!subscriptionGeneration) {
-          subscriptionGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
-        }
+      let queryGeneration: GenerationStrategy[] = []
+      let subscriptionGeneration: GenerationStrategy[] = []
+
+      if (graphQlGeneration) {
+        queryGeneration = graphQlGeneration.queryGeneration
+        subscriptionGeneration = graphQlGeneration.subscriptionGeneration
       } else {
-        if (!queryGeneration) {
-          queryGeneration = [GenerationStrategy.NO_GRAPHQL]
-        }
-        if (!subscriptionGeneration) {
-          subscriptionGeneration = [GenerationStrategy.NO_GRAPHQL]
+        if (enableAutomaticGraphQLQueryGenerationFromReadModels) {
+          queryGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
+          subscriptionGeneration = [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE]
         }
       }
 
