@@ -6,6 +6,7 @@ import { createInstance } from '@boostercloud/framework-common-helpers'
 import {
   BoosterConfig,
   EntitySnapshotEnvelope,
+  GenerationStrategy,
   Level,
   OptimisticConcurrencyUnexpectedVersionError,
   ProjectionMetadata,
@@ -115,12 +116,16 @@ describe('ReadModelStore', () => {
     authorizer: BoosterAuthorizer.allowAccess,
     properties: [],
     before: [],
+    queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+    subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
   }
   config.readModels[AnotherReadModel.name] = {
     class: AnotherReadModel,
     authorizer: BoosterAuthorizer.allowAccess,
     properties: [],
     before: [],
+    queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+    subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
   }
   config.projections[AnImportantEntity.name] = [
     {
