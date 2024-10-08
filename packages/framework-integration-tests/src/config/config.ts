@@ -85,6 +85,7 @@ Booster.configure('development', (config: BoosterConfig): void => {
     enabled: false,
   }
   config.injectable = injectable
+  config.enableAutomaticGraphQLQueryGenerationFromReadModels = true
   configureInvocationsHandler(config)
   configureBoosterSensorHealth(config)
 })

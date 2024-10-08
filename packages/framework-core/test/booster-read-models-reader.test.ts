@@ -3,6 +3,7 @@ import { expect } from './expect'
 import {
   BoosterConfig,
   FilterFor,
+  GenerationStrategy,
   GraphQLOperation,
   InvalidParameterError,
   NotAuthorizedError,
@@ -69,12 +70,16 @@ describe('BoosterReadModelReader', () => {
         authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
         properties: [],
         before: [],
+        queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+        subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
       }
       config.readModels[SequencedReadModel.name] = {
         class: SequencedReadModel,
         authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
         properties: [],
         before: [],
+        queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+        subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
       }
     })
 
@@ -262,6 +267,8 @@ describe('BoosterReadModelReader', () => {
         authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
         properties: [],
         before: [],
+        queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+        subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
       }
     })
 
@@ -358,6 +365,8 @@ describe('BoosterReadModelReader', () => {
           authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
           properties: [],
           before: [],
+          queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+          subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
         }
         migratorStub = stub(ReadModelSchemaMigrator.prototype, 'migrate')
       })
@@ -529,6 +538,8 @@ describe('BoosterReadModelReader', () => {
             authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
             properties: [],
             before: [fakeBeforeFn],
+            queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+            subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
           }
 
           replace(Booster, 'config', config) // Needed because the function `Booster.readModel` references `this.config` from `searchFunction`
@@ -564,6 +575,8 @@ describe('BoosterReadModelReader', () => {
             authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
             properties: [],
             before: [beforeFnSpy, beforeFnV2Spy],
+            queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+            subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
           }
 
           replace(Booster, 'config', config) // Needed because the function `Booster.readModel` references `this.config` from `searchFunction`
@@ -610,6 +623,8 @@ describe('BoosterReadModelReader', () => {
             authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
             properties: [],
             before: [],
+            queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+            subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
           }
 
           replace(config.provider.readModels, 'subscribe', providerSubscribeFunctionFake)
@@ -643,6 +658,8 @@ describe('BoosterReadModelReader', () => {
             authorizer: BoosterAuthorizer.authorizeRoles.bind(null, [UserRole]),
             properties: [],
             before: [beforeFn, beforeFnV2],
+            queryGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
+            subscriptionGeneration: [GenerationStrategy.GRAPHQL_LIST, GenerationStrategy.GRAPHQL_SINGLE],
           }
 
           replace(config.provider.readModels, 'subscribe', providerSubscribeFunctionFake)

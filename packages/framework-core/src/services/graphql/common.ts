@@ -95,7 +95,8 @@ export const filterReadModelsThatRequireGraphQLQueries = (
   config: BoosterConfig
 ): AnyClass[] => {
   return readModels.filter((readModel) => {
-    const graphqlQueryGenerationConfig = config.readModels[readModel.name].queryGeneration
+    const graphqlQueryGenerationConfig = config.readModels[readModel.name]?.queryGeneration
+    if (!graphqlQueryGenerationConfig) return config.enableAutomaticGraphQLQueryGenerationFromReadModels
     return graphqlQueryGenerationConfig.includes(GenerationStrategy.GRAPHQL_LIST)
   })
 }
@@ -105,7 +106,8 @@ export const filterReadModelsThatRequireGraphQLSubscriptions = (
   config: BoosterConfig
 ): AnyClass[] => {
   return readModels.filter((readModel) => {
-    const graphqlSubscriptionGenerationConfig = config.readModels[readModel.name].subscriptionGeneration
+    const graphqlSubscriptionGenerationConfig = config.readModels[readModel.name]?.subscriptionGeneration
+    if (!graphqlSubscriptionGenerationConfig) return config.enableAutomaticGraphQLQueryGenerationFromReadModels
     return graphqlSubscriptionGenerationConfig.includes(GenerationStrategy.GRAPHQL_LIST)
   })
 }

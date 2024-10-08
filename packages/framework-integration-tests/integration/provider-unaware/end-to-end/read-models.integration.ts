@@ -18,6 +18,7 @@ describe('Read models end-to-end tests', () => {
   describe('Query read models', () => {
     context('1 cart item', () => {
       const mockCartId: string = random.uuid()
+      const mockStockId: string = random.uuid()
       const mockProductId: string = random.uuid()
       const mockQuantity: number = random.number({ min: 1 })
 
@@ -69,6 +70,32 @@ describe('Read models end-to-end tests', () => {
           productId: mockProductId,
           quantity: mockQuantity,
         })
+      })
+
+      it('should not exist', async () => {
+        const queryResult = await waitForIt(
+          () => {
+            return client.query({
+              variables: {
+                id: mockStockId,
+              },
+              query: gql`
+                query AnotherStockReadModel($id: ID!) {
+                  AnotherStockReadModel(id: $id) {
+                    id
+                    cartItems {
+                      productId
+                      quantity
+                    }
+                  }
+                }
+              `,
+            })
+          },
+          (result) => result?.data?.CartReadModel != null
+        )
+
+        await expect(queryResult).to.eventually.be.rejectedWith(/This query does not exist/)
       })
 
       it('should apply modified filter by before hooks', async () => {

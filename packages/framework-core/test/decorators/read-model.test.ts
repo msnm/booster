@@ -54,6 +54,8 @@ describe('the `ReadModel` decorator', () => {
             },
           },
         ],
+        queryGeneration: [0, 1],
+        subscriptionGeneration: [0, 1],
       })
     })
   })
@@ -156,6 +158,8 @@ describe('the `ReadModel` decorator', () => {
             },
           },
         ],
+        queryGeneration: [0, 1],
+        subscriptionGeneration: [0, 1],
       })
     })
   })
