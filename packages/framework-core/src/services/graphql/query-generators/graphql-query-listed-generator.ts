@@ -7,7 +7,7 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql'
-import { GraphQLResolverContext, ResolverBuilder } from '../common'
+import { filterReadModelsThatRequireGraphQLQueries, GraphQLResolverContext, ResolverBuilder } from '../common'
 import * as inflected from 'inflected'
 import { GraphQLJSON } from 'graphql-scalars'
 
@@ -37,7 +37,7 @@ export class GraphqlQueryListedGenerator {
 
   public generateListedQueries(): GraphQLFieldConfigMap<unknown, GraphQLResolverContext> {
     const queries: GraphQLFieldConfigMap<unknown, GraphQLResolverContext> = {}
-    const readModelsThatRequireGraphQLQueries = this.filterReadModelsThatRequireGraphQLQueries(this.readModels, this.config);
+    const readModelsThatRequireGraphQLQueries = filterReadModelsThatRequireGraphQLQueries(this.readModels, this.config)
     for (const readModel of readModelsThatRequireGraphQLQueries) {
       const excludeProp = this.config.nonExposedGraphQLMetadataKey[readModel.name]
       const graphQLType = this.typeInformer.generateGraphQLTypeForClass(readModel, excludeProp)
@@ -57,13 +57,6 @@ export class GraphqlQueryListedGenerator {
       }
     }
     return queries
-  }
-
-  private filterReadModelsThatRequireGraphQLQueries(readModels: any[], config: any): any[] {
-    return readModels.filter((readModel) => {
-      const graphqlQueryGenerationConfig = config.readModels[readModel.name].graphqlQueryGenerationConfig;
-      return graphqlQueryGenerationConfig === 'GRAPHQL_LIST_AND_SINGLE_QUERIES' || graphqlQueryGenerationConfig === 'GRAPHQL_LIST_QUERY';
-    });
   }
 
   private generateListedQueriesFields(

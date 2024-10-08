@@ -6,6 +6,8 @@ import {
   GraphQLOperation,
   ReadModelInterface,
   ContextEnvelope,
+  BoosterConfig,
+  GenerationStrategy,
 } from '@boostercloud/framework-types'
 import {
   GraphQLEnumType,
@@ -85,6 +87,28 @@ export const buildGraphqlSimpleEnumFor = (enumName: string, values: Array<string
       valuesRecord[value] = { value }
       return valuesRecord
     }, {} as GraphQLEnumValueConfigMap),
+  })
+}
+
+export const filterReadModelsThatRequireGraphQLQueries = (
+  readModels: AnyClass[],
+  config: BoosterConfig
+): AnyClass[] => {
+  return readModels.filter((readModel) => {
+    const graphqlQueryGenerationConfig = config.readModels[readModel.name]?.queryGeneration
+    if (!graphqlQueryGenerationConfig) return config.enableAutomaticGraphQLQueryGenerationFromReadModels
+    return graphqlQueryGenerationConfig.includes(GenerationStrategy.GRAPHQL_LIST)
+  })
+}
+
+export const filterReadModelsThatRequireGraphQLSubscriptions = (
+  readModels: AnyClass[],
+  config: BoosterConfig
+): AnyClass[] => {
+  return readModels.filter((readModel) => {
+    const graphqlSubscriptionGenerationConfig = config.readModels[readModel.name]?.subscriptionGeneration
+    if (!graphqlSubscriptionGenerationConfig) return config.enableAutomaticGraphQLQueryGenerationFromReadModels
+    return graphqlSubscriptionGenerationConfig.includes(GenerationStrategy.GRAPHQL_LIST)
   })
 }
 

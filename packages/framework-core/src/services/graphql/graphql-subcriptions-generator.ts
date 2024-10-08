@@ -1,5 +1,5 @@
 import { GraphQLFieldConfigMap, GraphQLID, GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType } from 'graphql'
-import { ResolverBuilder } from './common'
+import { filterReadModelsThatRequireGraphQLSubscriptions, ResolverBuilder } from './common'
 import { GraphQLTypeInformer } from './graphql-type-informer'
 import * as inflected from 'inflected'
 import { AnyClass, BoosterConfig } from '@boostercloud/framework-types'
@@ -24,8 +24,12 @@ export class GraphQLSubscriptionGenerator {
   }
 
   public generate(): GraphQLObjectType | undefined {
-    const byIDSubscriptions = this.generateByIDSubscriptions()
-    const filterSubscriptions = this.generateFilterSubscriptions()
+    const readModelsRequiringSubscriptionGeneration = filterReadModelsThatRequireGraphQLSubscriptions(
+      this.readModels,
+      this.config
+    )
+    const byIDSubscriptions = this.generateByIDSubscriptions(readModelsRequiringSubscriptionGeneration)
+    const filterSubscriptions = this.generateFilterSubscriptions(readModelsRequiringSubscriptionGeneration)
     const fields = { ...byIDSubscriptions, ...filterSubscriptions }
     if (Object.keys(fields).length === 0) {
       return undefined
@@ -36,9 +40,9 @@ export class GraphQLSubscriptionGenerator {
     })
   }
 
-  private generateByIDSubscriptions(): GraphQLFieldConfigMap<any, any> {
+  private generateByIDSubscriptions(readModels: AnyClass[]): GraphQLFieldConfigMap<any, any> {
     const subscriptions: GraphQLFieldConfigMap<any, any> = {}
-    for (const readModel of this.readModels) {
+    for (const readModel of readModels) {
       const excludeProps = this.config.nonExposedGraphQLMetadataKey[readModel.name]
       const graphQLType = this.typeInformer.generateGraphQLTypeForClass(readModel, excludeProps)
       subscriptions[readModel.name] = {
@@ -53,9 +57,9 @@ export class GraphQLSubscriptionGenerator {
     return subscriptions
   }
 
-  private generateFilterSubscriptions(): GraphQLFieldConfigMap<any, any> {
+  private generateFilterSubscriptions(readModels: AnyClass[]): GraphQLFieldConfigMap<any, any> {
     const subscriptions: GraphQLFieldConfigMap<any, any> = {}
-    for (const readModel of this.readModels) {
+    for (const readModel of readModels) {
       const excludeProps = this.config.nonExposedGraphQLMetadataKey[readModel.name]
       const graphQLType = this.typeInformer.generateGraphQLTypeForClass(readModel, excludeProps)
       subscriptions[inflected.pluralize(readModel.name)] = {
